@@ -1,8 +1,13 @@
-import { Controller, Get, Post, Body, Param, Delete, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, UseGuards } from '@nestjs/common';
 import { BorrowService } from './borrow.service';
 import { CreateBorrowDto } from './dto/create-borrow.dto';
 import { UpdateBorrowDto } from './dto/update-borrow.dto';
+import { JwtAuthGuard } from 'src/guard/jwt.guard';
+import { RolesGuard } from 'src/guard/roles.guard';
+import { Roles } from 'src/guard/roles.decorator';
 
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('admin', 'librarian')
 @Controller('borrow')
 export class BorrowController {
   constructor(private readonly borrowService: BorrowService) {}

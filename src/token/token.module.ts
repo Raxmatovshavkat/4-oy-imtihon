@@ -3,7 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { RefreshTokenService } from './token.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { RefreshToken } from './entities/token.entity';
-import { TokenController } from './token.controller';
+
 
 @Module({
   imports: [
@@ -12,7 +12,7 @@ import { TokenController } from './token.controller';
       global: true,
     }),
   ],
-  controllers:[TokenController],
+  controllers:[],
   providers: [RefreshTokenService],
   exports: [RefreshTokenService],
 })

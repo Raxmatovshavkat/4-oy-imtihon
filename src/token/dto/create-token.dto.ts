@@ -1,15 +1,8 @@
-import { IsNotEmpty, IsOptional, IsString } from "class-validator";
+import { IsNotEmpty } from 'class-validator';
 
 export class RefreshTokenDto {
-    @IsString()
-    @IsOptional()
-    userId: string;
+    token: string;
+    userId: number;
+    expiryDate: Date; 
 
-    @IsString()
-    @IsOptional()
-    @IsNotEmpty()
-    token: string
-
-    @IsOptional()
-    expiryDate: Date
 }

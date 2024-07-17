@@ -26,7 +26,7 @@ export class EmailService {
             from: process.env.EMAIL_USERNAME,
             subject: 'Your OTP Code',
             text: `Your OTP code is ${otp}`,
-            html: `<b>Your OTP code is ${otp}</b>`,
+            html: `<b>Your OTP code is:${otp}</b>`,
         });
     }
 }

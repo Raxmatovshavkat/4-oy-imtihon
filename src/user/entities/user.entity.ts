@@ -21,7 +21,7 @@ export class User extends Model<User> {
     @Column({
         type:DataType.ENUM('user','admin','librarian')
     })
-    role:string="user"
+    role:string;
 
     @Column({
         type: DataType.ENUM('active','inactive')

@@ -1,4 +1,10 @@
+import { IsNotEmpty, IsString } from 'class-validator';
+
 export class CreateOtpDto {
-    userId:number;
-    otp:string;
+    @IsNotEmpty()
+    userId: number;
+
+    @IsNotEmpty()
+    @IsString()
+    otp: string;
 }

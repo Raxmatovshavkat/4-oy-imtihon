@@ -1,23 +1,13 @@
+import { Column, Model, Table } from 'sequelize-typescript';
 
-import { Column, Table, Model, AllowNull } from "sequelize-typescript";
+@Table({tableName:"tokens"})
+export class RefreshToken extends Model<RefreshToken> {
+    @Column
+    token: string;
 
+    @Column
+    userId: number;
 
-@Table
-export class RefreshToken extends Model {
-    @Column({
-        allowNull: false
-    })
-    userId: string
-
-    @Column({
-        allowNull: false,
-        unique: true
-    })
-    token: string
-
-    @Column({
-        allowNull: false
-    })
-    expiryDate: Date
+    @Column({ type: 'timestamp' })
+    expiryDate: Date // Ensure this property exists
 }
-

@@ -11,12 +11,13 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { LoggingInterceptor } from './log/logging.intercetor';
 import { databaseConfig } from './config/db';
 import { LogModule } from './log/log.module';
+import { RefreshTokenModule } from './token/token.module';
 
 @Module({
   imports: [SequelizeModule.forRoot(databaseConfig()), ConfigModule.forRoot({
     envFilePath:".env",
     isGlobal:true
-  }),BookModule, AuthorModule, UserModule, AuthModule, BorrowModule, OtpModule, UserModule, MailModule,LogModule],
+  }),BookModule, AuthorModule, UserModule, AuthModule, BorrowModule, OtpModule, UserModule, MailModule,LogModule,RefreshTokenModule],
   controllers: [],
   providers: [
     {

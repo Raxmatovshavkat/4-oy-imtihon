@@ -29,6 +29,7 @@ export class UserService {
       status: 'inactive',
     });
 
+
     try {
       const savedUser = await user.save();
       await this.emailService.sendEmail(email, otp);
@@ -64,21 +65,14 @@ export class UserService {
     }
     await user.destroy();
   }
-  async verifyOtp(createOtpDto: CreateOtpDto) {
-    const { userId, otp } = createOtpDto;
-    const savedOtp = await this.otpService.findOtpByUserIdAndOtp(userId, otp);
-    if (!savedOtp) {
-      throw new UnauthorizedException('Invalid OTP');
-    }
 
-    await this.otpService.remove(savedOtp.id);
+  async updateStatus(userId: number, status: string): Promise<void> {
     const user = await this.findOne(userId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
-
-    user.status = 'active';
+    user.status = status;
     await user.save();
+    
   }
-
 }

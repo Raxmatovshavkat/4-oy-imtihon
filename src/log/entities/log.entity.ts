@@ -1,4 +1,4 @@
-import { Column, Model, Table } from 'sequelize-typescript';
+import { Column, Model, Table, DataType } from 'sequelize-typescript';
 
 @Table
 export class Log extends Model {
@@ -8,10 +8,14 @@ export class Log extends Model {
     @Column
     url: string;
 
-    @Column
+    @Column({
+        type: DataType.TEXT,  // TEXT tipi cheksiz uzunlikka ega
+    })
     headers: string;
 
-    @Column
+    @Column({
+        type: DataType.TEXT,  // TEXT tipi cheksiz uzunlikka ega
+    })
     body: string;
 
     @Column

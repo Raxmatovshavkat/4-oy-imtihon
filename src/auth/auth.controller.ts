@@ -24,28 +24,31 @@ export class AuthController {
     return await this.authService.signIn(createLoginDto);
   }
 
-  @Get('me/:id')
-  @UseGuards( JwtAuthGuard, RolesGuard)
-  @Roles('admin','librarian')
+  @Get(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin','librarian','user')
   async findOne(@Param('id') id: string) {
     return await this.authService.me(+id);
   }
 
-  @Delete('logout/:id')
+  @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('admin')
-  async remove(@Param('id') id: string) {
+  @Roles('admin','librarian')
+  async remove(@Param('id') id: number) {
     return await this.authService.logout(+id);
   }
 
   @Post('refresh')
-  async refreshAccessToken(@Body() refreshTokenDto: RefreshTokenDto) {
-    return await this.authService.refreshAccessToken(refreshTokenDto.token);
+  async refresh(@Body('refreshToken') refreshToken: string) {
+    return this.authService.refreshAccessToken(refreshToken);
   }
 
   @Post('verify')
-  @UsePipes(ValidationPipe)
   async verify(@Body() createOtpDto: CreateOtpDto) {
-    return await this.authService.verify(createOtpDto);
+    const { id: userId, otp } = createOtpDto as any;
+    console.log(createOtpDto);
+
+    return await this.authService.verify(userId, otp);
   }
 }
+

@@ -1,45 +1,51 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { Injectable, UnauthorizedException, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { RefreshToken } from './entities/token.entity';
-import { RefreshTokenDto } from './dto/create-token.dto';
-import * as dotenv from 'dotenv';
-dotenv.config()
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class RefreshTokenService {
+  private readonly logger = new Logger(RefreshTokenService.name);
+
   constructor(
     @InjectModel(RefreshToken) private readonly refreshTokenModel: typeof RefreshToken,
-    private readonly jwtService: JwtService,
+    private readonly jwtService: JwtService
   ) { }
 
-  async storeRefreshToken(refreshTokenDto: RefreshTokenDto) {
-    await this.refreshTokenModel.create({ ...refreshTokenDto });
+  async storeRefreshToken({ token, userId, expiryDate }: { token: string; userId: number; expiryDate: Date }): Promise<void> {
+    this.logger.log(`Storing refresh token for userId: ${userId}`);
+    await this.refreshTokenModel.create({ token, userId, expiryDate });
   }
 
-  async refreshAccessToken(refreshToken: string): Promise<{ access_token: string }> {
-    const tokenData = await this.refreshTokenModel.findOne({ where: { token: refreshToken } });
-    if (!tokenData) {
+  async removeTokensForUser(userId: number): Promise<void> {
+    this.logger.log(`Removing all refresh tokens for userId: ${userId}`);
+    await this.refreshTokenModel.destroy({ where: { userId } });
+  }
+
+  async refreshAccessToken(refreshToken: string): Promise<{ accessToken: string }> {
+    this.logger.log(`Refreshing access token using refresh token: ${refreshToken}`);
+    if (!refreshToken) {
+      this.logger.error('Refresh token is undefined');
+      throw new UnauthorizedException('Refresh token is undefined');
+    }
+
+    const storedToken = await this.refreshTokenModel.findOne({ where: { token:refreshToken } });
+    if (!storedToken) {
+      this.logger.error('Invalid refresh token');
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const payload =  this.jwtService.verify(refreshToken, { secret: process.env.REFRESH_TOKEN_SECRET });
-    const newAccessToken = this.jwtService.sign(
-      { sub: payload.sub, email: payload.email },
-      { secret: process.env.ACCESS_TOKEN_SECRET, expiresIn: '5m' },
-    );
+    const { sub, email } = this.jwtService.verify(storedToken.token, { secret: process.env.DATABASE_REFRESH_TOKEN_SECRET });
+    const accessTokenSecret = process.env.DATABASE_ACCESS_TOKEN_SECRET;
 
-    return {
-      access_token: newAccessToken,
-    };
-  }
+    if (!accessTokenSecret) {
+      throw new Error('JWT access token secret not configured');
+    }
 
-  async removeTokensForUser(userId: number): Promise<{ acknowledged: boolean; deletedCount: number }> {
-    const result = await this.refreshTokenModel.destroy({ where: { userId } });
-    return { acknowledged: true, deletedCount: result };
-  }
+    const payload = { sub, email};
+    const accessToken = this.jwtService.sign(payload, { secret: accessTokenSecret, expiresIn: '5m' });
 
-  async getAll() {
-    return this.refreshTokenModel.findAll()
+
+    return { accessToken };
   }
 }
