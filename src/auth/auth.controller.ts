@@ -1,16 +1,17 @@
-import { Controller, Get, Post, Body, Param, Delete, ValidationPipe, UsePipes, UseGuards } from '@nestjs/common';
+// auth.controller.ts
+import { Controller, Get, Post, Body, Param, Delete, UsePipes, UseGuards, ValidationPipe } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateRegisterDto } from '../user/dto/register-user.dto';
 import { CreateLoginDto } from '../user/dto/login-user.dto ';
-import { JwtAuthGuard } from 'src/guard/guard';
+import { RolesGuard } from '../guard/roles.guard';
 import { RefreshTokenDto } from '../token/dto/create-token.dto';
-import { CreateOtpDto } from '../otp/dto/create-otp.dto'; 
+import { CreateOtpDto } from '../otp/dto/create-otp.dto';
+import { Roles } from '../guard/roles.decorator';
+import { JwtAuthGuard } from 'src/guard/jwt.guard';
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService
-  ) { }
+  constructor(private readonly authService: AuthService) { }
 
   @Post('register')
   @UsePipes(ValidationPipe)
@@ -24,13 +25,15 @@ export class AuthController {
   }
 
   @Get('me/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards( JwtAuthGuard, RolesGuard)
+  @Roles('admin','librarian')
   async findOne(@Param('id') id: string) {
     return await this.authService.me(+id);
   }
 
   @Delete('logout/:id')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   async remove(@Param('id') id: string) {
     return await this.authService.logout(+id);
   }
@@ -41,7 +44,7 @@ export class AuthController {
   }
 
   @Post('verify')
-  @UsePipes(ValidationPipe) 
+  @UsePipes(ValidationPipe)
   async verify(@Body() createOtpDto: CreateOtpDto) {
     return await this.authService.verify(createOtpDto);
   }

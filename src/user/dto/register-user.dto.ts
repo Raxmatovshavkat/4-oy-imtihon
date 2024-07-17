@@ -23,9 +23,9 @@ export class CreateRegisterDto {
     confirmPassword: string;
 
     @IsNotEmpty()
-    role:Array<string>
+    role: string="user" 
 
     @IsNotEmpty()
-    status:string;
+    status: string="inactive";
 
 }

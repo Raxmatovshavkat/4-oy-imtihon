@@ -1,14 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { MailerService } from '@nestjs-modules/mailer';
+import * as nodemailer from 'nodemailer';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 @Injectable()
 export class EmailService {
-    constructor(private readonly mailerService: MailerService) { }
+    private transporter;
+
+    constructor() {
+        this.transporter = nodemailer.createTransport({
+            host: process.env.EMAIL_HOST,
+            port: Number(process.env.EMAIL_PORT) || 587,
+            secure: false, 
+            auth: {
+                user: process.env.EMAIL_USERNAME,
+                pass: process.env.EMAIL_PASSWORD,
+            },
+        });
+    }
 
     async sendEmail(email: string, otp: string): Promise<void> {
-        await this.mailerService.sendMail({
+        await this.transporter.sendMail({
             to: email,
-            from: 'rshavkat759@gmail.com', 
+            from: process.env.EMAIL_USERNAME,
             subject: 'Your OTP Code',
             text: `Your OTP code is ${otp}`,
             html: `<b>Your OTP code is ${otp}</b>`,

@@ -1,8 +1,11 @@
 import { Module } from '@nestjs/common';
 import { BorrowService } from './borrow.service';
 import { BorrowController } from './borrow.controller';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { Borrow } from './entities/borrow.entity';
 
 @Module({
+  imports:[SequelizeModule.forFeature([Borrow])],
   controllers: [BorrowController],
   providers: [BorrowService],
 })

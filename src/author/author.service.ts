@@ -1,26 +1,46 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateAuthorDto } from './dto/create-author.dto';
 import { UpdateAuthorDto } from './dto/update-author.dto';
+import { InjectModel } from '@nestjs/sequelize';
+import { Author } from './entities/author.entity';
 
 @Injectable()
 export class AuthorService {
-  create(createAuthorDto: CreateAuthorDto) {
-    return 'This action adds a new author';
+  constructor(@InjectModel(Author) private readonly authorService:typeof Author){}
+
+ async create(createAuthorDto: CreateAuthorDto) {
+    return await this.authorService.create({...createAuthorDto});
   }
 
-  findAll() {
-    return `This action returns all author`;
+  async findAll() {
+    const auhtor=await this.authorService.findAll()
+    if(!auhtor){
+      throw new NotFoundException('Author topilmadi')
+    }
+    return auhtor
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} author`;
+  async findOne(id: number) {
+    const auhtor=await this.authorService.findByPk(id)
+    if(!auhtor){
+      throw new NotFoundException('auhtor bu id buyicha topilmadi')
+    }
+    return auhtor
   }
 
-  update(id: number, updateAuthorDto: UpdateAuthorDto) {
-    return `This action updates a #${id} author`;
+  async update(id: number, updateAuthorDto: UpdateAuthorDto) {
+    const auhtor = await this.authorService.findByPk(id)
+    if (!auhtor) {
+      throw new NotFoundException('auhtor bu id buyicha topilmadi')
+    }
+    return auhtor.update(updateAuthorDto)
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} author`;
+  async remove(id: number) {
+    const auhtor = await this.authorService.findByPk(id)
+    if (!auhtor) {
+      throw new NotFoundException('auhtor bu id buyicha topilmadi')
+    }
+    return auhtor.destroy()
   }
 }

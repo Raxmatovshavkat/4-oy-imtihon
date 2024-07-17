@@ -5,7 +5,7 @@ import { Otp } from './entities/otp.entity';
 
 @Injectable()
 export class OtpService {
-  constructor(@InjectModel(Otp) private readonly otpService:typeof Otp) {
+  constructor(@InjectModel(Otp) private readonly otpService: typeof Otp) {
 
   }
 
@@ -14,7 +14,7 @@ export class OtpService {
   }
 
   async saveOtp(createOtpDto: CreateOtpDto) {
-    return await this.otpService.create({...createOtpDto});
+    return await this.otpService.create({ ...createOtpDto });
   }
 
   async remove(id: number): Promise<void> {

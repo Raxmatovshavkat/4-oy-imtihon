@@ -5,8 +5,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { User } from './entities/user.entity';
 import * as otpGenerator from 'otp-generator';
 import * as bcrypt from 'bcrypt';
-import { EmailService } from 'src/mail/mail.service';
-import { OtpService } from 'src/otp/otp.service'; 
+import { EmailService } from '../Mail/mail.service';
+import { OtpService } from 'src/otp/otp.service';
 import { CreateOtpDto } from 'src/otp/dto/create-otp.dto';
 
 @Injectable()
@@ -14,7 +14,7 @@ export class UserService {
   constructor(
     @InjectModel(User) private readonly userModel: typeof User,
     private readonly emailService: EmailService,
-    private readonly otpService: OtpService 
+    private readonly otpService: OtpService
   ) { }
 
   async register(createUserDto: CreateRegisterDto) {
@@ -26,7 +26,7 @@ export class UserService {
       ...rest,
       email,
       password: hashedPassword,
-      status: 'inactive', 
+      status: 'inactive',
     });
 
     try {

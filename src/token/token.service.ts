@@ -23,7 +23,7 @@ export class RefreshTokenService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const payload = this.jwtService.verify(refreshToken, { secret: process.env.REFRESH_TOKEN_SECRET });
+    const payload =  this.jwtService.verify(refreshToken, { secret: process.env.REFRESH_TOKEN_SECRET });
     const newAccessToken = this.jwtService.sign(
       { sub: payload.sub, email: payload.email },
       { secret: process.env.ACCESS_TOKEN_SECRET, expiresIn: '5m' },

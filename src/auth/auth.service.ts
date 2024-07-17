@@ -1,13 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { CreateRegisterDto } from '../user/dto/register-user.dto';
 import { CreateLoginDto } from '../user/dto/login-user.dto ';
-import { UserService } from 'src/user/user.service';
+import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
-import { RefreshTokenService } from 'src/token/token.service';
-import { CreateOtpDto } from 'src/otp/dto/create-otp.dto';
-import { OtpService } from 'src/otp/otp.service'; 
-import { User } from 'src/user/entities/user.entity';
-import { InjectModel } from '@nestjs/sequelize';
+import { RefreshTokenService } from '../token/token.service';
+import { CreateOtpDto } from '../otp/dto/create-otp.dto';
 
 
 @Injectable()
@@ -15,9 +12,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
-    private readonly refreshService: RefreshTokenService,
-   
-    @InjectModel(User) private readonly userModel: typeof User
+    private readonly refreshService: RefreshTokenService
   ) { }
 
   async signup(createRegisterDto: CreateRegisterDto) {

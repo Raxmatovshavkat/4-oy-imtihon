@@ -6,7 +6,6 @@ import { Otp } from './entities/otp.entity';
 
 @Module({
   imports:[SequelizeModule.forFeature([Otp])],
-  controllers: [],
   providers: [OtpService],
   exports:[OtpService]
 })
