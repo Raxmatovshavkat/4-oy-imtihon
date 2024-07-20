@@ -6,41 +6,51 @@ import { Author } from './entities/author.entity';
 
 @Injectable()
 export class AuthorService {
-  constructor(@InjectModel(Author) private readonly authorService:typeof Author){}
+  constructor(@InjectModel(Author) private readonly authorModel: typeof Author) { }
 
- async create(createAuthorDto: CreateAuthorDto) {
-    return await this.authorService.create({...createAuthorDto});
+  async create(createAuthorDto: CreateAuthorDto): Promise<Author> {
+    const author = new Author({
+      ...createAuthorDto,
+      dateOfBirth: createAuthorDto.dateOfBirth ? new Date(createAuthorDto.dateOfBirth) : null,
+    });
+    return author.save();
   }
 
-  async findAll() {
-    const auhtor=await this.authorService.findAll()
-    if(!auhtor){
-      throw new NotFoundException('Author topilmadi')
+  async findAll(): Promise<Author[]> {
+    const authors = await this.authorModel.findAll();
+    if (!authors) {
+      throw new NotFoundException('Authors not found');
     }
-    return auhtor
+    return authors;
   }
 
-  async findOne(id: number) {
-    const auhtor=await this.authorService.findByPk(id)
-    if(!auhtor){
-      throw new NotFoundException('auhtor bu id buyicha topilmadi')
+  async findOne(id: number): Promise<Author> {
+    const author = await this.authorModel.findByPk(id);
+    if (!author) {
+      throw new NotFoundException('Author not found');
     }
-    return auhtor
+    return author;
   }
 
-  async update(id: number, updateAuthorDto: UpdateAuthorDto) {
-    const auhtor = await this.authorService.findByPk(id)
-    if (!auhtor) {
-      throw new NotFoundException('auhtor bu id buyicha topilmadi')
+  async update(id: number, updateAuthorDto: UpdateAuthorDto): Promise<Author> {
+    const author = await this.authorModel.findByPk(id);
+    if (!author) {
+      throw new NotFoundException('Author not found');
     }
-    return auhtor.update(updateAuthorDto)
+
+    const updatedFields: any = { ...updateAuthorDto };
+    if (updateAuthorDto.dateOfBirth) {
+      updatedFields.dateOfBirth = new Date(updateAuthorDto.dateOfBirth);
+    }
+
+    return author.update(updatedFields);
   }
 
-  async remove(id: number) {
-    const auhtor = await this.authorService.findByPk(id)
-    if (!auhtor) {
-      throw new NotFoundException('auhtor bu id buyicha topilmadi')
+  async remove(id: number): Promise<void> {
+    const author = await this.authorModel.findByPk(id);
+    if (!author) {
+      throw new NotFoundException('Author not found');
     }
-    return auhtor.destroy()
+    await author.destroy();
   }
 }

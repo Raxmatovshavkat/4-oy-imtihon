@@ -6,9 +6,9 @@ dotenv.config()
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  // app.useGlobalPipes(new ValidationPipe({
-  //   whitelist: true,
-  // }));
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true,
+  }));
   const port = process.env.DATABASE_PORT
   await app.listen(port,()=>{
     console.log(`Server is running on port ${port}`);

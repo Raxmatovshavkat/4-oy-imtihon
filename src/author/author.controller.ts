@@ -8,12 +8,12 @@ import { JwtAuthGuard } from 'src/guard/jwt.guard';
 
 @Controller('author')
 export class AuthorController {
-  constructor(private readonly authorService: AuthorService) {}
+  constructor(private readonly authorService: AuthorService) { }
 
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('librarian')
- async create(@Body() createAuthorDto: CreateAuthorDto) {
+  @Roles('librarian', 'admin')
+  async create(@Body() createAuthorDto: CreateAuthorDto) {
     return await this.authorService.create(createAuthorDto);
   }
 
@@ -33,7 +33,7 @@ export class AuthorController {
   }
 
   @Delete(':id')
-  @UseGuards(JwtAuthGuard,RolesGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   async remove(@Param('id') id: string) {
     return await this.authorService.remove(+id);

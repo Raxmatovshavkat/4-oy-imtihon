@@ -1,46 +1,52 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize';
 import { CreateBookDto } from './dto/create-book.dto';
 import { UpdateBookDto } from './dto/update-book.dto';
-import { InjectModel } from '@nestjs/sequelize';
 import { Book } from './entities/book.entity';
 
 @Injectable()
 export class BookService {
-  constructor(@InjectModel(Book) private readonly bookService:typeof Book){}
+  constructor(@InjectModel(Book) private readonly bookModel: typeof Book) { }
 
-  async create(createBookDto: CreateBookDto) {
-    return await this.bookService.create({...createBookDto});
+  async create(createBookDto: CreateBookDto): Promise<Book> {
+    const book = new Book({
+      ...createBookDto,
+      publicationDate: new Date(createBookDto.publicationDate),
+    });
+    return book.save();
   }
 
-  async findAll() {
-    const book=await this.bookService.findAll()
-    if(!book){
-      throw new UnauthorizedException()
-    }
-    return book
+  async findAll(): Promise<Book[]> {
+    return this.bookModel.findAll();
   }
 
-  async findOne(id: number) {
-    const book=await this.bookService.findByPk(id)
-    if(!book){
-      throw new NotFoundException()
-    }
-    return book
-  }
-
-  async update(id: number, updateBookDto: UpdateBookDto) {
-    const book = await this.bookService.findByPk(id)
+  async findOne(id: number): Promise<Book> {
+    const book = await this.bookModel.findByPk(id);
     if (!book) {
-      throw new NotFoundException()
+      throw new NotFoundException('Book not found');
     }
-    return book.update(updateBookDto)
+    return book;
   }
 
-  async remove(id: number) {
-    const book = await this.bookService.findByPk(id)
+  async update(id: number, updateBookDto: UpdateBookDto): Promise<Book> {
+    const book = await this.bookModel.findByPk(id);
     if (!book) {
-      throw new NotFoundException()
+      throw new NotFoundException('Book not found');
     }
-    return book.destroy()
+
+    const updatedFields: any = { ...updateBookDto };
+    if (updateBookDto.publicationDate) {
+      updatedFields.publicationDate = new Date(updateBookDto.publicationDate);
+    }
+
+    return book.update(updatedFields);
+  }
+
+  async remove(id: number): Promise<void> {
+    const book = await this.bookModel.findByPk(id);
+    if (!book) {
+      throw new NotFoundException('Book not found');
+    }
+    await book.destroy();
   }
 }

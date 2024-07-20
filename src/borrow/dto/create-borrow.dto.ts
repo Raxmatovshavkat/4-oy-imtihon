@@ -1,22 +1,27 @@
-import { IsDate, IsNotEmpty, IsNumber, IsString } from "class-validator";
+import { IsNotEmpty, IsNumber, IsDateString, IsString } from 'class-validator';
 
 export class CreateBorrowDto {
     @IsNumber()
     @IsNotEmpty()
     bookId: number;
-    @IsNotEmpty()
+
     @IsNumber()
-    userId: number
     @IsNotEmpty()
-    @IsDate()
+    userId: number;
+
+    @IsDateString({}, { message: 'borrowDate must be a valid date string' })
+    @IsNotEmpty()
     borrowDate: Date;
-    @IsDate()
+
+    @IsDateString({}, { message: 'dueDate must be a valid date string' })
     @IsNotEmpty()
     dueDate: Date;
+
+    @IsDateString({}, { message: 'returnDate must be a valid date string' })
     @IsNotEmpty()
-    @IsDate()
-    returnDate: Date
+    returnDate: Date;
+
     @IsNotEmpty()
     @IsString()
-    status: string="borrowed"
+    status: string = "borrowed";
 }
